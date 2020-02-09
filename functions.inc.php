@@ -173,7 +173,7 @@ function outputMessages($queueMessages) {
         }
         // echo  "$Matrix, $messageText, $Position, $MATRIX_FONT, $MATRIX_FONT_SIZE, $COLOR, $MATRIX_PIXELS_PER_SECOND, $MATRIX_FONT_ANTIALIAS";
         
-        DisplayTextOnModel("localhost", $Matrix, $messageText, $Position, $MATRIX_FONT, $MATRIX_FONT_SIZE, $COLOR, $MATRIX_PIXELS_PER_SECOND, $MATRIX_FONT_ANTIALIAS);
+        DisplayTextOnModel("localhost", $Matrix, urldecode($messageText), $Position, $MATRIX_FONT, $MATRIX_FONT_SIZE, $COLOR, $MATRIX_PIXELS_PER_SECOND, $MATRIX_FONT_ANTIALIAS); // NBP 2/2/2020 need urldecode() for messageText
         if ($Position != "Center") {
             $isLocked = GetModelData("localhost", $Matrix)["isLocked"];
             while ($isLocked) {
