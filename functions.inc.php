@@ -140,7 +140,7 @@ function outputMessages($queueMessages) {
         }
     }
     if ($auto == "false") {
-        enableMatrixToolOutput();
+        enableMatrixToolOutput($Matrix);
     }
 
     for ($i=0;$i<=count($queueMessages)-1;$i++) {
@@ -185,7 +185,7 @@ function outputMessages($queueMessages) {
             $Position = "Center";
         }
         // echo  "$Matrix, $messageText, $Position, $MATRIX_FONT, $MATRIX_FONT_SIZE, $COLOR, $MATRIX_PIXELS_PER_SECOND, $MATRIX_FONT_ANTIALIAS";
-                
+          
         DisplayTextOnModel("localhost", $Matrix, $messageText, $Position, $MATRIX_FONT, $MATRIX_FONT_SIZE, $COLOR, $MATRIX_PIXELS_PER_SECOND, $MATRIX_FONT_ANTIALIAS, $DURATION, $auto);
         if ($waitForScroll) {
             if ($Position != "Center") {

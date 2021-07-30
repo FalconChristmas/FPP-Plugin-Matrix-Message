@@ -22,17 +22,17 @@ function PrintOverlayMode($overlayMode) {
 	echo "</select> \n";
 }
 
-function clearMatrix($matrix="") {
+function clearMatrix($matrix="", $host="") {
 	global $pluginDirectory, $fpp_matrixtools_Plugin, $fpp_matrixtools_Plugin_Script,$Matrix,$settings;;
 	
 	if ($matrix == "") {
 		$matrix = $Matrix;
 	}
     
-    ClearModel("localhost", $Matrix);
+    ClearModel($host, $Matrix);
 }
 
-function enableMatrixToolOutput($matrix="") {
+function enableMatrixToolOutput($matrix="", $host="") {
 	global $DEBUG, $fpp_version, $settings, $pluginDirectory,$fpp_matrixtools_Plugin, $fpp_matrixtools_Plugin_Script,$Matrix, $overlayMode;
 	
 	if ($overlayMode == "") {
@@ -43,20 +43,20 @@ function enableMatrixToolOutput($matrix="") {
 		$matrix = $Matrix;
 	}
     
-    SetModelState("localhost", $matrix, $overlayMode);
+    SetModelState($host, $matrix, $overlayMode);
 }
 
-function disableMatrixToolOutput($matrix="") {
+function disableMatrixToolOutput($matrix="", $host="") {
 	global $DEBUG, $fpp_version, $settings,$pluginDirectory,$fpp_matrixtools_Plugin, $fpp_matrixtools_Plugin_Script,$Matrix;
 
 	if($matrix =="" ) {
 		$matrix = $Matrix;
 	}
-    SetModelState("localhost", $matrix, 0);
+    SetModelState($host, $matrix, 0);
 }
-function PrintMatrixList($SELECT_NAME="MATRIX",$MATRIX_READ) {
+function PrintMatrixList($SELECT_NAME="MATRIX", $MATRIX_READ, $host="") {
 	global $pluginDirectory,$fpp_matrixtools_Plugin,$fpp_matrixtools_Plugin_Script;//,$blockOutput;
-	$blockOutput = GetModels("localhost");
+	$blockOutput = GetModels($host);
 	//print_r($blockOutput);
 
 	echo "<select name=\"".$SELECT_NAME."\" id=\"".$SELECT_NAME."\">";
