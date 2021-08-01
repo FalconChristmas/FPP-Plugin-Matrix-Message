@@ -1,7 +1,7 @@
 {
     "repoName": "FPP-Plugin-Matrix-Message",
     "name": "Message Queue to Matrix Overlay",
-    "author": "Ben Shaver (bshaver) and Pat Delaney (patdelaney)",
+    "author": "Ben Shaver (bshaver) and Pat Delaney (patdelaney) updated by Rick Harris",
     "description": "Allows messages out the configured Matrix",
     "homeURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message",
     "srcURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message.git",
