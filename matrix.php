@@ -5,7 +5,7 @@
 
 
 $pluginName = basename(dirname(__FILE__));
-$MatrixMessageVersion = "2.0";
+$MatrixMessageVersion = "3.0";
 $myPid = getmypid();
 
 $DEBUG=false;
