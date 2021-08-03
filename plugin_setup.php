@@ -144,7 +144,7 @@ $canvasHeight = 400;
 
 </div>
 <input type=hidden name=LAST_READ value= <? $LAST_READ ?>> <!-- is this needed?? -->
-<p>ENABLE PLUGIN: <?PrintSettingCheckbox("Matrix Message Plugin", "ENABLED", 0, 0, "ON", "OFF", $pluginName ,$callbackName = "", $changedFunction = "checkForPlugins()"); ?> </p>
+<p>ENABLE PLUGIN: <?PrintSettingCheckbox("Matrix Message Plugin", "ENABLED", 0, 0, "ON", "OFF", $pluginName ,$callbackName = "", $changedFunction = ""); ?> </p>
 <p>Matrix Name: <? PrintSettingSelect("MATRIX", "MATRIX", 0, 0, $defaultValue="", $values = GetOverlayList(), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
 <p>Overlay Mode: <? PrintSettingSelect("OVERLAY_MODE", "OVERLAY_MODE", 0, 0, "", Array("Full Overlay" => "1", "Transparent" => "2", "Transparent RGB" => "3"), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
 <p><h3>The Overlay mode determines how you want your message to display.</h3>
