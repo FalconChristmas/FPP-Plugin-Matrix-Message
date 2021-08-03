@@ -10,146 +10,121 @@ include_once "MatrixFunctions.inc.php";
 include_once 'version.inc';
 $pluginName = basename(dirname(__FILE__));
 
-//2.3 - Dec 4 2016 - Remove the mulitple demand messages code - was messing up
-
-//2.2 - Dec 2 2016 - Abaility to send multiple on demand messages and have them send in a stream!
 
 $fpp_matrixtools_Plugin = "fpp-matrixtools";
 $fpp_matrixtools_Plugin_Script = "scripts/matrixtools";
+$fpp_message_queue_Plugin = "FPP-Plugin-MessageQueue";
 $FPP_MATRIX_PLUGIN_ENABLED=false;
 $logFile = $settings['logDirectory']."/".$pluginName.".log";
-
-$pluginUpdateFile = $settings['pluginDirectory']."/".$pluginName."/"."pluginUpdate.inc";
-
-
 $gitURL = "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message.git";
 
-logEntry("plugin update file: ".$pluginUpdateFile);
 
-if(isset($_POST['updatePlugin']))
-{
-	logEntry("updating plugin...");
-	$updateResult = updatePluginFromGitHub($gitURL, $branch="master", $pluginName);
-
-	echo $updateResult."<br/> \n";
-}
-
-
-if(isset($_POST['submit']))
-{
-	$PLUGINS =  implode(',', $_POST["PLUGINS"]);
-
-//	echo "Writring config fie <br/> \n";
-	WriteSettingToFile("PLUGINS",$PLUGINS,$pluginName);
-	
-//	WriteSettingToFile("ENABLED",urlencode($_POST["ENABLED"]),$pluginName);
-	WriteSettingToFile("FONT",urlencode($_POST["FONT"]),$pluginName);
-    WriteSettingToFile("FONT_ANTIALIAS",urlencode($_POST["FONT_ANTIALIAS"]),$pluginName);
-	WriteSettingToFile("FONT_SIZE",urlencode($_POST["FONT_SIZE"]),$pluginName);
-    WriteSettingToFile("PIXELS_PER_SECOND",urlencode($_POST["PIXELS_PER_SECOND"]),$pluginName);
-    WriteSettingToFile("DURATION",urlencode($_POST["DURATION"]),$pluginName);
-	WriteSettingToFile("COLOR",urlencode($_POST["COLOR"]),$pluginName);
-
-	
-	WriteSettingToFile("LAST_READ",urlencode($_POST["LAST_READ"]),$pluginName);
-    if (isset($_POST["MESSAGE_TIMEOUT"])) {
-        WriteSettingToFile("MESSAGE_TIMEOUT",urlencode($_POST["MESSAGE_TIMEOUT"]),$pluginName);
-    } else {
-        WriteSettingToFile("MESSAGE_TIMEOUT", 10, $pluginName);
-    }
-    
-	WriteSettingToFile("MATRIX",urlencode($_POST["MATRIX"]),$pluginName);
-    if (isset($_POST["INCLUDE_TIME"])) {
-        WriteSettingToFile("INCLUDE_TIME",urlencode($_POST["INCLUDE_TIME"]),$pluginName);
-    } else {
-        WriteSettingToFile("INCLUDE_TIME", 0, $pluginName);
-    }
-	WriteSettingToFile("TIME_FORMAT",urlencode($_POST["TIME_FORMAT"]),$pluginName);
-	WriteSettingToFile("HOUR_FORMAT",urlencode($_POST["HOUR_FORMAT"]),$pluginName);	
-	WriteSettingToFile("OVERLAY_MODE",urlencode($_POST["OVERLAY_MODE"]),$pluginName);
-    
-    $pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
-    if (file_exists($pluginConfigFile)) {
-        $pluginSettings = parse_ini_file($pluginConfigFile);
-    }
-}
-
-	
-	
-	
-//	$PLUGINS = urldecode(ReadSettingFromFile("PLUGINS",$pluginName));
-$PLUGINS = $pluginSettings['PLUGINS'];
-//	$ENABLED = urldecode(ReadSettingFromFile("ENABLED",$pluginName));
-$ENABLED = $pluginSettings['ENABLED'];
-//	$Matrix = urldecode(ReadSettingFromFile("MATRIX",$pluginName));
-$Matrix = urldecode($pluginSettings['MATRIX']);
-//$MatrixHost = urldecode($pluginSettings['MATRIX_HOST']);
-//if (!isset($MatrixHost) || $MatrixHost == "") {
-//    $MatrixHost = $_SERVER['SERVER_ADDR'];
-//}
-//	$LAST_READ = urldecode(ReadSettingFromFile("LAST_READ",$pluginName));
-$LAST_READ = $pluginSettings['LAST_READ'];
-$FONT= urldecode($pluginSettings['FONT']);
-$FONT_SIZE= $pluginSettings['FONT_SIZE'];
-if (!isset($FONT_SIZE) || $FONT_SIZE == "") {
-    $FONT_SIZE = 20;
-}
-$FONT_ANTIALIAS= $pluginSettings['FONT_ANTIALIAS'];
-$PIXELS_PER_SECOND= $pluginSettings['PIXELS_PER_SECOND'];
-$DURATION=10;
-if (isset($pluginSettings['DURATION'])) {
-    $DURATION=$pluginSettings['DURATION'];
-}
-$COLOR= urldecode($pluginSettings['COLOR']);
-
-$INCLUDE_TIME = urldecode($pluginSettings['INCLUDE_TIME']);
-$TIME_FORMAT = urldecode($pluginSettings['TIME_FORMAT']);
-$HOUR_FORMAT = urldecode($pluginSettings['HOUR_FORMAT']);
 
 if (isset($pluginSettings['DEBUG'])) {
     $DEBUG = urldecode($pluginSettings['DEBUG']);
 } else {
     $DEBUG = false;
 }
-$overlayMode = urldecode($pluginSettings['OVERLAY_MODE']);
 
-if($overlayMode == "") {
-	$overlayMode = "1";
+	
+if(file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script) && file_exists($pluginDirectory."/".$fpp_message_queue_Plugin ))  { // show error message if required plugins not installed
+	logEntry($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script." EXISTS: Enabling");
+	$FPP_MATRIX_PLUGIN_ENABLED=true;
+} else {
+	if (!file_exists($pluginDirectory."/".$fpp_message_queue_Plugin )){
+		logEntry("Message Queue to Matrix Overlay plugin is not installed, cannot use this plugin with out it");
+		echo "<h1>Message Queue to Matrix Overlay is not installed. Install the plugin and revisit this page to continue.</h1><br/>";	
+	}
+	if (!file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script)){
+	logEntry("FPP Matrix tools plugin is not installed, cannot use this plugin with out it");
+	echo "<h1>FPP Matrix Tools plugin is not installed. Install the plugin and revisit this page to continue.</h1>";
+	}
+	exit(0);
+	
 }
-	
-	if(file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script))
-	{
-		logEntry($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script." EXISTS: Enabling");
-		$FPP_MATRIX_PLUGIN_ENABLED=true;
 
-		createMatrixEventFile();
-	} else {
-		logEntry("FPP Matrix tools plugin is not installed, cannot use this plugin with out it");
-		echo "FPP Matrix Tools plugin is not installed. Install the plugin and revisit this page to continue";
-		exit(0);
-	
+$canvasWidth = 1000;
+$canvasHeight = 400;
+?>
+<style>
+
+.matrix-tool-bottom-panel {
+	padding-top: 0px !important;
+}
+
+.red {
+	background: #ff0000;
+}
+
+.green {
+	background: #00ff00;
+}
+
+.blue {
+	background: #0000ff;
+}
+
+.yellow {
+	background: #ffff00;
+}
+
+.orange {
+	background: #ff8800;
+}
+
+.white {
+	background: #ffffff;
+}
+
+.black {
+	background: #000000;
+}
+
+.colorButton {
+	-moz-transition: border-color 250ms ease-in-out 0s;
+	background-clip: padding-box;
+	border: 2px solid rgba(0, 0, 0, 0.25);
+	border-radius: 50% 50% 50% 50%;
+	cursor: pointer;
+	display: inline-block;
+	height: 20px;
+	margin: 1px 2px;
+	width: 20px;
+}
+
+#currentColor {
+    border: 2px solid #000000;
+}
+
+</style>
+<script type="text/javascript">
+
+    function ShowColorPicker() {
+		if ($('#ShowColorPicker').is(':checked')) {
+            $('#colpicker').show();
+        } else {
+            $('#colpicker').hide();
+        }
+    }
+
+	function setColor(color, updateColpicker = true) {
+		if (color.substring(0,1) != '#')
+			color = '#' + color;
+
+        pluginSettings['COLOR'] = color;
+        SetPluginSetting('FPP-Plugin-Matrix-Message', 'COLOR', color, 0, 0);
+        $('#currentColor').css('background-color', color);
+
+		currentColor = color;
+
+        if (updateColpicker)
+		    $('#colpicker').colpickSetColor(color);
+
+		
 	}
 
-?>
-
-<script language="Javascript">
-function updateMatrixList() {
-    var host = $('#MatrixHost').val();
-    var url = 'http://' + host + '/api/overlays/models';
-    $('#MATRIX').empty();
-	$.ajax({
-		url: url,
-		dataType: 'json',
-		success: function(data) {
-           data.forEach(function (element, index) {
-                        var o = new Option(element.Name, element.Name);
-                        $(o).html(element.Name);
-                        $('#MATRIX').append(o);
-                    });
-		}
-	});
-}
 </script>
+
 
 <div id="<?echo $pluginName;?>" class="settings">
 <fieldset>
@@ -167,126 +142,91 @@ function updateMatrixList() {
 </ul>
 
 
-
-<form method="post" action="/plugin.php?plugin=<?echo $pluginName;?>&page=plugin_setup.php">
-
-
-<?
-echo "<input type=\"hidden\" name=\"LAST_READ\" value=\"".$LAST_READ."\"> \n";
-$restart=0;
-$reboot=0;
-
-echo "ENABLE PLUGIN: ";
-
-//if($ENABLED== 1 || $ENABLED == "on") {
-//		echo "<input type=\"checkbox\" checked name=\"ENABLED\"> \n";
-PrintSettingCheckbox("Matrix Message Plugin", "ENABLED", $restart = 0, $reboot = 0, "ON", "OFF", $pluginName = $pluginName, $callbackName = "");
-//	} else {
-//		echo "<input type=\"checkbox\"  name=\"ENABLED\"> \n";
-//}
-
-echo "<p/> \n";
-
-// Does not work yet as we need to enable CORS on the api's
-// echo "Matrix Host: ";
-// echo "<input type='text' name='hostname' value='$MatrixHost' id='MatrixHost' onChange='updateMatrixList()'>";
-// echo "<p/>\n";
-
-echo "Matrix Name: ";
-PrintMatrixList("MATRIX",$Matrix);
-
-echo "<p/>\n";
-
-echo "Overlay Mode: ";
-
-PrintOverlayMode($overlayMode);
-
-
-echo "<p/>\n";
-
-echo "Include Time: ";
-
-if($INCLUDE_TIME == 1 || $INCLUDE_TIME == "on") {
-	echo "<input type=\"checkbox\" checked name=\"INCLUDE_TIME\"> \n";
-	//PrintSettingCheckbox("Radio Station", "ENABLED", $restart = 0, $reboot = 0, "ON", "OFF", $pluginName = $pluginName, $callbackName = "");
-} else {
-	echo "<input type=\"checkbox\"  name=\"INCLUDE_TIME\"> \n";
-}
-
-echo "Time Format: ";
-printTimeFormats("TIME_FORMAT",$TIME_FORMAT);
-
-
-echo "Hour Format: ";
-printHourFormats("HOUR_FORMAT",$HOUR_FORMAT);
+</div>
+<input type=hidden name=LAST_READ value= <? $LAST_READ ?>> <!-- is this needed?? -->
+<p>ENABLE PLUGIN: <?PrintSettingCheckbox("Matrix Message Plugin", "ENABLED", 0, 0, "ON", "OFF", $pluginName ,$callbackName = "", $changedFunction = "checkForPlugins()"); ?> </p>
+<p>Matrix Name: <? PrintSettingSelect("MATRIX", "MATRIX", 0, 0, $defaultValue="", $values = GetOverlayList(), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
+<p>Overlay Mode: <? PrintSettingSelect("OVERLAY_MODE", "OVERLAY_MODE", 0, 0, "", Array("Full Overlay" => "1", "Transparent" => "2", "Transparent RGB" => "3"), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
+<p><h3>The Overlay mode determines how you want your message to display.</h3>
+<ul>
+	<li>Full Overlay- This will blank out the model and only display your message</li>
+	<li>Transparent- This will display your message over the top of whatever is displaying on your matrix <br/>
+		but the colors will blend slightly with what is currently being displayed</li>
+	<li>Transparent RGB- This will display your message over the top of whatever is displaying on your matrix <br/>
+		the colors will override what is currently being displayed</li> 
+</ul>
+<p>Include Time: <?PrintSettingCheckbox("Include Time", "INCLUDE_TIME", 0, 0, "on", "off", $pluginName , ""); ?> 
+ Time Format: <? PrintSettingSelect("Time Format", "TIME_FORMAT", 0, 0, $defaultValue="HH:MM", Array("HH:MM" => "h:i", "HH:MM:SS" => "h:i:s"), $pluginName, $callbackName = "", $changedFunction = ""); ?> 
+ Hour Format: <? PrintSettingSelect("Hour Format", "HOUR_FORMAT", 0, 0, $defaultValue="24 Hour", Array("24 Hour" => "24", "12 Hour" => "12"), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
+<p>Plugins to use: <? PrintSettingMultiSelect("PLUGINS", "PLUGINS", 0, 0, $defaultValue="", $values = getInstalledPlugins($host=""), $pluginName, $callbackName = "", $changedFunction = ""); ?></p>
+<p>Font: <? PrintSettingSelect("FONT", "FONT", 0, 0, $defaultValue="", getFontsInstalled(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+ Font Size: <? PrintSettingSelect("FONT_SIZE", "FONT_SIZE", 0, 0, $defaultValue="20", getFontSizes(), $pluginName, $callbackName = "", $changedFunction = ""); ?>
+ Anti-Aliased: <?PrintSettingCheckbox("FONT_ANTIALIAS", "FONT_ANTIALIAS", 0, 0, "1", "", $pluginName , ""); ?> 
+ Scroll Speed: <? PrintSettingSelect("PIXELS_PER_SECOND", "PIXELS_PER_SECOND", 0, 0, $defaultValue="20", getScrollSpeed(), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
+Duration: <? PrintSettingSelect("DURATION", "DURATION", 0, 0, $defaultValue="10", getDuration(), $pluginName, $callbackName = "", $changedFunction = ""); ?> </p>
+<p><b>If you set the scroll speed to 0, then the message will display on the center of the matrix <br/>
+for the number of seconds set in the Duration</b></p> 
+<div id= "divCanvas" class='ui-tabs-panel matrix-tool-bottom-panel'>
+			<table border=0>
+            <tr><td valign='top'>
+			<div>
+				<table border=0>
+					<tr><td valign='top'>Pallette:</td>
+						<td><div class='colorButton red' onClick='setColor("#ff0000");'></div>
+							<div class='colorButton green' onClick='setColor("#00ff00");'></div>
+							<div class='colorButton blue' onClick='setColor("#0000ff");'></div>
+						    <div class='colorButton white' onClick='setColor("#ffffff");'></div>
+							<div class='colorButton black' onClick='setColor("#000000");'></div>
+						</td>
+					</tr>
+                    <tr><td>Current Color:</td><td><span id='currentColor'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>
+            <tr><td colspan='2'>Show Color Picker: <? PrintSettingCheckbox("Show Color Picker", "ShowColorPicker", 0, 0, "1", "0", "FPP-Plugin-Matrix-Message", "ShowColorPicker"); ?></td></tr>
+            <tr><td valign='top' colspan='2'>
+                <div id="colpicker"></div>
+			</td></tr>
+				</table>
+			</div>
+			</td></tr>
+            </table>
+			
+			
+				
+		</div>
 
 
-
-
-echo "<p/> \n";
-echo "Include Plugins in Matrix output: \n";
-printPluginsInstalled();
-
-echo "<p/> \n";
-
-echo "Font:  \n";
-printFontsInstalled("FONT",$FONT);
-
-echo "<p/> \n";
-echo "Font Size: \n";
-printFontSizes("FONT_SIZE",$FONT_SIZE);
-$aachecked = "";
-if (isset($FONT_ANTIALIAS) && $FONT_ANTIALIAS == "1") {
-    $aachecked = "checked";
-}
-echo "<input type='checkbox' name='FONT_ANTIALIAS' value='1' $aachecked >Anti-Aliased</input>";
-echo "<p/> \n";
-
-echo "Pixels per second: \n";
-printPixelsPerSecond("PIXELS_PER_SECOND",$PIXELS_PER_SECOND);
-echo "<p/> \n";
-echo "Duration (s): \n";
-echo "<input name='DURATION' type='number' min='0' max='300' value='" . $DURATION . "'/>";
-echo "<p/> \n";
-
-echo "Color: (#RRGGBB or common name 'red' or for a random color type 'random') \n";
-
-if($COLOR == "") {
-	//set a default color
-	$COLOR = "yellow";
-}
-echo "<input type=\"text\" name=\"COLOR\" value=\"".$COLOR."\"> \n";
-echo "<p/> \n";
-//echo "<hr> \n";
-//echo "Example text: \n";
-//echo "<hr/> \n";
-//$messageText="Font: ".$FONT." Example";
-//echo "<marquee behavior=\"scroll\" scrollamount=\"5\" direction=\"left\" onmouseover=\"this.stop();\" onmouseout=\"this.start();\">\n";
-//echo "<font face=\"".$FONT."\" size=\"+".$FONT_SIZE."\" color=\"".$COLOR."\"> \n";
-
-//echo preg_replace('!\s+!', ' ', $messageText);
-//echo "</font> \n";
-//echo "</marquee> \n";
-?>
-<p/>
-<input id="submit_button" name="submit" type="submit" class="buttons" value="Save Config">
-<?
- if(file_exists($pluginUpdateFile))
- {
- 	//echo "updating plugin included";
-	include $pluginUpdateFile;
-}
-?>
 <p>To report a bug, please file it against <?php echo $gitURL;?>
-</form>
 
-<form method="post" action="/plugin.php?plugin=<?echo $pluginName;?>&page=fontManagement.php">
-<input id="fontManagement" name="Font Management" type="submit" value="Font Management">
-</form>
 
 
 </fieldset>
 </div>
 <br />
 </html>
+<script>
 
+	$("#matrixTabs").tabs({active: 0, cache: true, spinner: "", fx: { opacity: 'toggle', height: 'toggle' } });
+
+    var colpickTimer = null;
+	$('#colpicker').colpick({
+		flat: true,
+		layout: 'rgbhex',
+		color: '#ff0000',
+		submit: false,
+		onChange: function(hsb,hex,rgb,el,bySetColor) {
+            if (colpickTimer != null)
+                clearTimeout(colpickTimer);
+
+            colpickTimer = setTimeout(function() { setColor('#'+hex, false); }, 500);
+		}
+	});
+
+    if (pluginSettings.hasOwnProperty('COLOR') && pluginSettings['COLOR'] != '') {
+        currentColor = pluginSettings['COLOR'];
+        $('#currentColor').css('background-color', currentColor);
+    }
+
+    ShowColorPicker();
+	GetBlockList();
+    GetFontList();
+
+</script>
