@@ -2,81 +2,7 @@
 
 include_once dirname(__FILE__) . "/../fpp-matrixtools/scripts/matrixtools.php.inc";
 
-function printHourFormats($ELEMENT_NAME,$ELEMENT_SELECTED)
-{
 
-	global $DEBUG;
-
-	$T_FORMATS = array("12","24");
-
-	echo "<select  name=\"".$ELEMENT_NAME."\">";
-
-	//print_r($PLUGINS_READ);
-
-	for($i=0;$i<=count($T_FORMATS)-1;$i++) {
-		if($T_FORMATS[$i] == $ELEMENT_SELECTED) {
-			echo "<option selected value=\"" . $ELEMENT_SELECTED . "\">" . $ELEMENT_SELECTED . " HR</option>";
-		} else {
-			echo "<option value=\"" . $T_FORMATS[$i] . "\">" . $T_FORMATS[$i] . " HR</option>";
-		}
-	}
-	echo "</select>";
-}
-
-function printTimeFormats($ELEMENT_NAME,$ELEMENT_SELECTED)
-{
-
-	global $DEBUG;
-
-	$T_FORMATS = array("h:i" => "HH:MM","h:i:s" => "HH:MM:SS");
-	echo "<select  name=\"".$ELEMENT_NAME."\">";
-	
-	//print_r($PLUGINS_READ);
-	foreach($T_FORMATS as $key => $value)
-	{
-		if($key == $ELEMENT_SELECTED) {
-			echo "<option selected value=\"" . $key . "\">" . $value . "</option>";
-		} else {
-			echo "<option value=\"" . $key . "\">" .  $value . "</option>";
-		}
-
-	}
-	echo "</select>";
-}
-
-function createMatrixEventFile() {
-	global $eventDirectory,$pluginDirectory,$pluginName,$scriptDirectory;
-
-	//echo "next event file name available: ".$nextEventFilename."\n";
-
-	$EVENT_KEY = "RUN-MATRIX";
-
-	//check to see that the file doesnt already exist - do a grep and return contents
-	$EVENT_CHECK = checkEventFilesForKey($EVENT_KEY);
-	if(!$EVENT_CHECK)
-	{
-			
-		$nextEventFilename = getNextEventFilename();
-		$MAJOR=substr($nextEventFilename,0,2);
-		$MINOR=substr($nextEventFilename,3,2);
-		$eventData  ="";
-		$eventData  = "majorID=".(int)$MAJOR."\n";
-		$eventData .= "minorID=".(int)$MINOR."\n";
-		$eventData .= "name='".$EVENT_KEY."'\n";
-		$eventData .= "effect=''\n";
-		$eventData .= "startChannel=\n";
-		$eventData .= "script='".$EVENT_KEY.".sh'\n";
-
-		//	echo "eventData: ".$eventData."<br/>\n";
-		file_put_contents($eventDirectory."/".$nextEventFilename, $eventData);
-
-		$scriptCMD = $pluginDirectory."/".$pluginName."/"."matrix.php";
-		createScriptFile($EVENT_KEY.".sh",$scriptCMD);
-	}
-	//echo "$key => $val\n";
-}
-    
-    
 function outputMessages($queueMessages) {
 	global $DEBUG, $pluginDirectory,$MESSAGE_TIMEOUT, $fpp_matrixtools_Plugin, $fpp_matrixtools_Plugin_Script,$Matrix,$MATRIX_FONT,$MATRIX_FONT_SIZE,$MATRIX_PIXELS_PER_SECOND,$COLOR, $INCLUDE_TIME, $TIME_FORMAT, $HOUR_FORMAT,$SEPARATOR, $MATRIX_FONT_ANTIALIAS, $waitForScroll,$DURATION,$overlayMode;
 
@@ -205,119 +131,65 @@ function outputMessages($queueMessages) {
         disableMatrixToolOutput($Matrix);
     }
 }
-
-
-
-function printPluginsInstalled()
-{
-
-	global $PLUGINS,$pluginDirectory;
-
+function getInstalledPlugins($host) {
 	include_once 'excluded_plugins.inc.php';
-	//get all plugins
 	
-	$PLUGINS_INSTALLED = directoryToArray($pluginDirectory, false);
-	//print_r($PLUGINS_INSTALLED);
-	
-
-	$PLUGINS_READ = explode(",",$PLUGINS);
-	//print_r($PLUGINS_READ);
-
-	echo "<select multiple=\"multiple\" name=\"PLUGINS[]\">";
-
-
-	for($i=0;$i<=count($PLUGINS_INSTALLED)-1;$i++) {
-		$PLUGIN_INSTALLED_TEMP = basename($PLUGINS_INSTALLED[$i]);
-
-		if(in_array($PLUGIN_INSTALLED_TEMP,$EXCLUDE_PLUGIN_ARRAY)) {
+    if ($host == "") {
+        $host = "localhost";
+    }
+    $ch = curl_init("http://" . $host . "/api/plugin");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    $data = curl_exec($ch);
+    curl_close($ch);
+	$pluginsInstalled = json_decode($data, true);
+	for($i=0;$i<=count($pluginsInstalled)-1;$i++) {
+		if(in_array($pluginsInstalled[$i],$EXCLUDE_PLUGIN_ARRAY)) {
 			continue;
 		}
-		if((substr($PLUGIN_INSTALLED_TEMP,0,1) != "." && substr($PLUGIN_INSTALLED_TEMP,0,1) != "_")) {
-			if(in_array($PLUGIN_INSTALLED_TEMP,$PLUGINS_READ)) {
-					
-				echo "<option selected value=\"" . $PLUGIN_INSTALLED_TEMP . "\">" . $PLUGIN_INSTALLED_TEMP . "</option>";
-			} else {
-	
-				echo "<option value=\"" . $PLUGIN_INSTALLED_TEMP . "\">" . $PLUGIN_INSTALLED_TEMP . "</option>";
-			}
-		}
-
+		$pluginList[$pluginsInstalled[$i]]=$pluginsInstalled[$i];
 	}
-	echo "</select>";
-}
-
-function printPixelsPerSecond($ELEMENT, $PIXELS_PER_SECOND)
-{
-
-        global $PLUGINS,$pluginDirectory;
-
-        //updated to 40, Nov 9 2015
-        $MAX_PIXELS_PER_SECOND = 99;
-
-        echo "<select name=\"".$ELEMENT."\">";
-
-
-        for($i=0;$i<=$MAX_PIXELS_PER_SECOND-1;$i++) {
-
-                        if($i == $PIXELS_PER_SECOND) {
-
-                                 echo "<option selected value=\"" . $i. "\">" . $i. "</option>";
-                       } else {
-                        echo "<option value=\"" . $i. "\">" . $i. "</option>";
-                        }
-        }
-        echo "</select>";
-}
-function printFontSizes($ELEMENT, $FONT_SIZE)
-{
-
-        global $PLUGINS,$pluginDirectory;
-
-	$MAX_FONT_SIZE = 64;
-
-        echo "<select name=\"".$ELEMENT."\">";
-
-
-        for($i=0;$i<=$MAX_FONT_SIZE-1;$i++) {
-
-                        if($i == $FONT_SIZE) {
-
-                                 echo "<option selected value=\"" . $i. "\">" . $i. "</option>";
-                       } else {
-                        echo "<option value=\"" . $i. "\">" . $i. "</option>";
-                        }
-        }
-        echo "</select>";
-}
-
-
-
-
-function printFontsInstalled($ELEMENT, $FONT)
-{
-
-	// this uses the fpp-matrix tools plugin to get the fonts that it can use!
+	//error_log( $test = var_dump($pluginList), 0);
 	
-	
-        global $DEBUG,$PLUGINS,$pluginDirectory, $fpp_matrixtools_Plugin_Script, $fpp_matrixtools_Plugin;
-
-    $fontsList = GetFonts("localhost");
-
-        echo "<select name=\"".$ELEMENT."\">";
+    return $pluginList;
+}
 
 
-        for($i=1;$i<=count($fontsList)-1;$i++) {
-	//	$FONTINFO = pathinfo($FONTS_INSTALLED[$i]);
-       //         $FONTS_INSTALLED_TEMP = basename($FONTS_INSTALLED[$i],'.'.$FONTINFO['extension']);
 
-			if($fontsList[$i] == $FONT) {
-			
-                       		 echo "<option selected value=\"" . $FONT . "\">" . $FONT . "</option>";
-                       } else { 
-			echo "<option value=\"" . $fontsList[$i] . "\">" . $fontsList[$i] . "</option>";
-			}
+function getScrollSpeed(){
+	$MAX_PIXELS_PER_SECOND = 200;
+
+        for($i=0;$i<=$MAX_PIXELS_PER_SECOND;$i++) {
+			$scrollSpeed[$i]= $i;
         }
-        echo "</select>";
+	return $scrollSpeed;
+}
+function getDuration(){
+	$MAX_DURATION = 300;
+
+        for($i=1;$i<=$MAX_DURATION;$i++) {
+			$maxDuration[$i]= $i;
+        }
+	return $maxDuration;
+}
+
+function getFontSizes(){
+	$maxFontSize = 80;
+	
+	for($i=5; $i<=$maxFontSize; $i++) {
+		$fontSize[$i]=$i;
+    }
+return $fontSize;	
+}
+
+
+function getFontsInstalled() {
+
+	$fontsList = GetFonts("localhost"); // this uses the fpp-matrix tools plugin to get the fonts that it can use!
+	for($i=1;$i<=count($fontsList)-1;$i++) {
+		$installedFonts[$fontsList[$i]]=$fontsList[$i];
+	}
+return $installedFonts;        
 }
 
 
@@ -405,11 +277,7 @@ function processCallback($argv) {
 	
 	if($DEBUG)
 		print_r($argv);
-	//argv0 = program
 	
-	//argv2 should equal our registration // need to process all the rgistrations we may have, array??
-	//argv3 should be --data
-	//argv4 should be json data
 	
 	$registrationType = $argv[2];
 	$data =  $argv[4];
