@@ -2,7 +2,7 @@
     "repoName": "FPP-Plugin-Matrix-Message",
     "name": "Message Queue to Matrix Overlay",
     "author": "Ben Shaver (bshaver) and Pat Delaney (patdelaney) updated by Rick Harris",
-    "description": "This plugin will push the messages that are in the Message queue plugin to your Matrix. This Plugin requires the MAtrix Tools plugin and the Message Queue Aggregator Plugin",
+    "description": "This plugin will push the messages that are in the Message queue plugin to your Matrix. This Plugin requires the Matrix Tools plugin and the Message Queue Aggregator Plugin",
     "homeURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message",
     "srcURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message.git",
     "bugURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message/issues",
