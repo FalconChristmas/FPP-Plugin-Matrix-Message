@@ -17,7 +17,7 @@
 		public static function lock() {
 			global $argv;
 
-			$lock_file = LOCK_DIR.$argv[0].LOCK_SUFFIX;
+			$lock_file = LOCK_DIR.LOCK_SUFFIX; // NBP 2/2/2020 drop .$argv[0]
 
 			if(file_exists($lock_file)) {
 				//return FALSE;
@@ -45,7 +45,7 @@
 		public static function unlock() {
 			global $argv;
 
-			$lock_file = LOCK_DIR.$argv[0].LOCK_SUFFIX;
+			$lock_file = LOCK_DIR.LOCK_SUFFIX; // NBP 2/2/2020 drop .$argv[0]
 
 			if(file_exists($lock_file))
 				unlink($lock_file);
