@@ -5,7 +5,7 @@
 
 
 $pluginName = basename(dirname(__FILE__));
-$MatrixMessageVersion = "3.0";
+$MatrixMessageVersion = "3.1";
 $myPid = getmypid();
 
 $DEBUG=false;
@@ -40,9 +40,11 @@ $messageQueueFile = urldecode(ReadSettingFromFile("MESSAGE_FILE",$messageQueue_P
 
 
 $pluginConfigFile = $settings['configDirectory'] . "/plugin." .$pluginName;
-if (file_exists($pluginConfigFile))
+if (file_exists($pluginConfigFile)){
 	$pluginSettings = parse_ini_file($pluginConfigFile);
-
+}else{
+    $pluginSettings= array();
+}
 	
 	//if it is locked then exit. however; we may need to tell it to keep running in a message queue situation
 	//do not run it again - if the matrix is active. //this feature blocks this as well
@@ -54,7 +56,11 @@ if (file_exists($pluginConfigFile))
 	
 
 //$ENABLED = trim(urldecode(ReadSettingFromFile("ENABLED",$pluginName)));
-$ENABLED = $pluginSettings['ENABLED'];
+if (isset($pluginSettings['ENABLED'])){
+    $ENABLED = $pluginSettings['ENABLED'];
+}else{
+     $ENABLED ="";
+}
 
 
 
@@ -79,27 +85,104 @@ if ( $return_val != 0 )
 	
 	logEntry("FPP version: ".$fpp_version);
 
+//Get plugin settings and if they do not exist, set defaults to use so it will still work
 
-//$MATRIX_PLUGIN_OPTIONS = urldecode(ReadSettingFromFile("PLUGINS",$pluginName));
+if (isset($pluginSettings['PLUGINS'])){
+    $MATRIX_PLUGIN_OPTIONS = $pluginSettings['PLUGINS'];
+}else{
+    $MATRIX_PLUGIN_OPTIONS = "";
+    logEntry("No plugins specifically defined, plugin will not work unless plugins are defined to use this program");
+}
 
-$MATRIX_PLUGIN_OPTIONS = $pluginSettings['PLUGINS'];
+if (isset($pluginSettings['FONT'])){
+    $MATRIX_FONT= $pluginSettings['FONT'];
+}else{
+    $MATRIX_FONT= reset(getFontsInstalled());
+    logEntry("Font not specifically defined, using default font instead");
+}
 
-$MATRIX_FONT= $pluginSettings['FONT'];
+if (isset($pluginSettings['FONT_SIZE'])){
+    $MATRIX_FONT_SIZE= $pluginSettings['FONT_SIZE'];
+}else{
+    $MATRIX_FONT_SIZE="23";
+    logEntry("Font size not specifically defined, using default font size instead");
+}
 
-$MATRIX_FONT_SIZE= $pluginSettings['FONT_SIZE'];
-$MATRIX_FONT_ANTIALIAS= $pluginSettings['FONT_ANTIALIAS'];
+if (isset($pluginSettings['FONT_ANTIALIAS'])){
+    $MATRIX_FONT_ANTIALIAS= $pluginSettings['FONT_ANTIALIAS'];
+}else{
+    $MATRIX_FONT_ANTIALIAS="";
+    logEntry("Antialias not specifically defined, using default none instead"); 
+}
+
 if (isset($MATRIX_FONT_ANTIALIAS) && $MATRIX_FONT_ANTIALIAS == "1") {
     $MATRIX_FONT_ANTIALIAS = true;
 } else {
     $MATRIX_FONT_ANTIALIAS = false;
 }
-$COLOR= urldecode($pluginSettings['COLOR']);
-$MATRIX_PIXELS_PER_SECOND = $pluginSettings['PIXELS_PER_SECOND'];
-$DURATION = $pluginSettings['DURATION'];
 
-$INCLUDE_TIME = urldecode($pluginSettings['INCLUDE_TIME']);
-$TIME_FORMAT = urldecode($pluginSettings['TIME_FORMAT']);
-$HOUR_FORMAT = urldecode($pluginSettings['HOUR_FORMAT']);
+if (isset($pluginSettings['COLOR'])){
+    $COLOR= urldecode($pluginSettings['COLOR']);
+}else{
+    $COLOR="#00ff00";
+    logEntry("Color not specifically defined, using default color of Green instead");
+}
+
+if (isset($pluginSettings['PIXELS_PER_SECOND'])){
+    $MATRIX_PIXELS_PER_SECOND = $pluginSettings['PIXELS_PER_SECOND'];
+}else{
+    $MATRIX_PIXELS_PER_SECOND = "30";
+    logEntry("Pixels per Second not specifically defined, using default value instead");
+}
+
+if (isset($pluginSettings['DURATION'])){
+    $DURATION = $pluginSettings['DURATION'];
+}else{
+     $DURATION ="10";
+     logEntry("Duration not specifically defined, using default value instead");
+}
+
+if (isset($pluginSettings['INCLUDE_TIME'])){
+    $INCLUDE_TIME = urldecode($pluginSettings['INCLUDE_TIME']);
+}else{
+    $INCLUDE_TIME = "";
+    logEntry("Include Time not specifically defined, using default instead");
+}
+
+if (isset($pluginSettings['TIME_FORMAT'])){
+    $TIME_FORMAT = urldecode($pluginSettings['TIME_FORMAT']);
+}else{
+    $TIME_FORMAT = "h:i:s";
+    logEntry("Time Format not specifically defined, using default instead");
+}
+
+if (isset($pluginSettings['HOUR_FORMAT'])){
+    $HOUR_FORMAT = urldecode($pluginSettings['HOUR_FORMAT']);
+}else{
+    $HOUR_FORMAT = "24";
+    logEntry("Hour Format not specifically defined, using default instead");
+}
+
+if (isset($pluginSettings['MATRIX'])){
+    $Matrix = urldecode($pluginSettings['MATRIX']);
+}else{
+    $Matrix = reset(GetOverlayList());
+    logEntry("Overlay Model not specifically defined, using default Overlay instead");
+}
+
+if (isset($pluginSettings['OVERLAY_MODE'])){
+    $overlayMode = urldecode($pluginSettings['OVERLAY_MODE']);
+}else{
+     $overlayMode = "1";
+     logEntry("Overlay Mode not specifically defined, using default instead");
+}
+
+if (isset($pluginSettings['MESSAGE_TIMEOUT'])){
+    $MATRIX_MESSAGE_TIMEOUT = $pluginSettings['MESSAGE_TIMEOUT'];
+}else{
+    $MATRIX_MESSAGE_TIMEOUT = "10";
+    logEntry("Message Timeout not specifically defined, using default instead");
+}
 
 if (isset($pluginSettings['DEBUG'])) {
     $DEBUG = urldecode($pluginSettings['DEBUG']);
@@ -107,12 +190,9 @@ if (isset($pluginSettings['DEBUG'])) {
     $DEBUG = false;
 }
 
+
 $SEPARATOR = "|";
 
-//$Matrix = urldecode(ReadSettingFromFile("MATRIX",$pluginName));
-
-$Matrix = urldecode($pluginSettings['MATRIX']);
-$overlayMode = urldecode($pluginSettings['OVERLAY_MODE']);
 
 if(trim($Matrix == "")) {
 	logEntry("No Matrix name is  configured for output: exiting");
@@ -123,8 +203,6 @@ if(trim($Matrix == "")) {
 	
 }
 
-//$MATRIX_MESSAGE_TIMEOUT = urldecode(ReadSettingFromFile("MESSAGE_TIMEOUT",$pluginName));
-$MATRIX_MESSAGE_TIMEOUT = $pluginSettings['MESSAGE_TIMEOUT'];
 
 if($MATRIX_MESSAGE_TIMEOUT == "" || $MATRIX_MESSAGE_TIMEOUT == null) {
 	$MESSAGE_TIMEOUT = 10;
@@ -133,12 +211,6 @@ if($MATRIX_MESSAGE_TIMEOUT == "" || $MATRIX_MESSAGE_TIMEOUT == null) {
 	$MESSAGE_TIMEOUT = (int)trim($MATRIX_MESSAGE_TIMEOUT);
 }
 
-//echo "message timeout: ".$MESSAGE_TIMEOUT."\n";
-
-//echo "message plugins to export: ".$MATRIX_PLUGIN_OPTIONS."\n";
-
-
-//echo $messageQueueFile."\n";
 
 if(file_exists($messageQueuePluginPath."functions.inc.php")) {
     include $messageQueuePluginPath."functions.inc.php";
