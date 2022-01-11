@@ -23,10 +23,10 @@ include_once("commonFunctions.inc.php");
 require ("lock.helper.php");
 define('LOCK_DIR', '/tmp/');
 define('LOCK_SUFFIX', $pluginName.'.lock');
-$messageQueue_Plugin = "MessageQueue";
-if (strpos($pluginName, "FPP-Plugin") !== false) {
-    $messageQueue_Plugin = "FPP-Plugin-MessageQueue";
-}
+$messageQueue_Plugin = "FPP-Plugin-MessageQueue"; // NBP 2/2/2020
+//if (strpos($pluginName, "FPP-Plugin") !== false) {
+//    $messageQueue_Plugin = "FPP-Plugin-MessageQueue";
+//}
 $MESSAGE_QUEUE_PLUGIN_ENABLED=false;
 
 $fpp_matrixtools_Plugin = "fpp-matrixtools";
