@@ -143,6 +143,7 @@ function getInstalledPlugins($host) {
     $data = curl_exec($ch);
     curl_close($ch);
 	$pluginsInstalled = json_decode($data, true);
+    $pluginList = [];
 	for($i=0;$i<=count($pluginsInstalled)-1;$i++) {
 		if(in_array($pluginsInstalled[$i],$EXCLUDE_PLUGIN_ARRAY)) {
 			continue;

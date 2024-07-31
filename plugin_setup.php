@@ -1,7 +1,7 @@
 <?php
 
 
-include_once "/opt/fpp/www/common.php";
+include_once "common.php";
 include_once "functions.inc.php";
 include_once "commonFunctions.inc.php";
 include_once "MatrixFunctions.inc.php";
@@ -36,11 +36,10 @@ if(file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools
 		echo "<h1>Message Queue to Matrix Overlay is not installed. Install the plugin and revisit this page to continue.</h1><br/>";	
 	}
 	if (!file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script)){
-	logEntry("FPP Matrix tools plugin is not installed, cannot use this plugin with out it");
-	echo "<h1>FPP Matrix Tools plugin is not installed. Install the plugin and revisit this page to continue.</h1>";
+        logEntry("FPP Matrix tools plugin is not installed, cannot use this plugin with out it");
+        echo "<h1>FPP Matrix Tools plugin is not installed. Install the plugin and revisit this page to continue.</h1>";
 	}
 	exit(0);
-	
 }
 
 $canvasWidth = 1000;
