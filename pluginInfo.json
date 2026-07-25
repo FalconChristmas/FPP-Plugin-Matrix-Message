@@ -6,6 +6,7 @@
     "homeURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message",
     "srcURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message.git",
     "bugURL": "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message/issues",
+    "iconURL": "https://raw.githubusercontent.com/FalconChristmas/FPP-Plugin-Matrix-Message/master/icon.png",
     "versions": [
         {
             "minFPPVersion": "2.7",
