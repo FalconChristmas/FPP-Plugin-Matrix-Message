@@ -32,12 +32,12 @@ if(file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools
 	$FPP_MATRIX_PLUGIN_ENABLED=true;
 } else {
 	if (!file_exists($pluginDirectory."/".$fpp_message_queue_Plugin )){
-		logEntry("Message Queue to Matrix Overlay plugin is not installed, cannot use this plugin with out it");
-		echo "<h1>Message Queue to Matrix Overlay is not installed. Install the plugin and revisit this page to continue.</h1><br/>";	
+		logEntry("Message Queue Aggregator for Plugins is not installed, cannot use this plugin with out it");
+		echo "<h1>Message Queue Aggregator for Plugins is not installed. Install the plugin and revisit this page to continue.</h1><br/>";	
 	}
 	if (!file_exists($pluginDirectory."/".$fpp_matrixtools_Plugin."/".$fpp_matrixtools_Plugin_Script)){
-        logEntry("FPP Matrix tools plugin is not installed, cannot use this plugin with out it");
-        echo "<h1>FPP Matrix Tools plugin is not installed. Install the plugin and revisit this page to continue.</h1>";
+        logEntry("MatrixTools plugin is not installed, cannot use this plugin with out it");
+        echo "<h1>MatrixTools plugin is not installed. Install the plugin and revisit this page to continue.</h1>";
 	}
 	exit(0);
 }
