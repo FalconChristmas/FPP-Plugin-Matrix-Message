@@ -15,7 +15,7 @@ $fpp_matrixtools_Plugin = "fpp-matrixtools";
 $fpp_matrixtools_Plugin_Script = "scripts/matrixtools";
 $fpp_message_queue_Plugin = "FPP-Plugin-MessageQueue";
 $FPP_MATRIX_PLUGIN_ENABLED=false;
-$logFile = $settings['logDirectory']."/".$pluginName.".log";
+$logFile = $settings['logDirectory']."/plugin-".$pluginName.".log";
 $gitURL = "https://github.com/FalconChristmas/FPP-Plugin-Matrix-Message.git";
 
 
