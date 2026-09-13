@@ -15,9 +15,7 @@
 		}
 
 		public static function lock() {
-			global $argv;
-
-			$lock_file = LOCK_DIR.$argv[0].LOCK_SUFFIX;
+			$lock_file = LOCK_FILE;
 
 			if(file_exists($lock_file)) {
 				//return FALSE;
@@ -43,9 +41,11 @@
 		}
 
 		public static function unlock() {
-			global $argv;
+			// Only the CLI process that took the lock (or an explicit POST) may release it - never a plain GET
+			if(PHP_SAPI !== 'cli' && $_SERVER['REQUEST_METHOD'] !== 'POST')
+				return FALSE;
 
-			$lock_file = LOCK_DIR.$argv[0].LOCK_SUFFIX;
+			$lock_file = LOCK_FILE;
 
 			if(file_exists($lock_file))
 				unlink($lock_file);

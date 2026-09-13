@@ -115,8 +115,11 @@ function outputMessages($queueMessages) {
         DisplayTextOnModel("localhost", $Matrix, $messageText, $Position, $MATRIX_FONT, $MATRIX_FONT_SIZE, $COLOR, $MATRIX_PIXELS_PER_SECOND, $MATRIX_FONT_ANTIALIAS, $DURATION, $auto);
         if ($waitForScroll) {
             if ($Position != "Center") {
+                // Only runs from the CLI matrix.php background process, never a web request.
+                // Bounded so a stuck overlay lock can't hold this forever.
+                $maxWait = 300;
                 $isLocked = GetModelData("localhost", $Matrix)["isLocked"];
-                while ($isLocked) {
+                while ($isLocked && $maxWait-- > 0) {
                     sleep(1);
                     $isLocked = GetModelData("localhost", $Matrix)["isLocked"];
                 }
@@ -140,6 +143,8 @@ function getInstalledPlugins($host) {
     $ch = curl_init("http://" . $host . "/api/plugin");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     $data = curl_exec($ch);
     curl_close($ch);
 	$pluginsInstalled = json_decode($data, true);

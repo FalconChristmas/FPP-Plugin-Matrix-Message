@@ -10,12 +10,12 @@ $pluginName = basename(dirname(__FILE__));
 $fpp_matrixtools_Plugin = "fpp-matrixtools";
 $fpp_matrixtools_Plugin_Script = "scripts/matrixtools";
 $FPP_MATRIX_PLUGIN_ENABLED=false;
-$logFile = $settings['logDirectory']."/".$pluginName.".log";
+$logFile = $settings['logDirectory']."/plugin-".$pluginName.".log";
 $P10Matrix = urldecode(ReadSettingFromFile("P10Matrix",$pluginName));
 
 echo "outputing video!!! \n";
 
-$VIDEO_PATH = "/home/pi/media/effects/";
+$VIDEO_PATH = $settings['mediaDirectory']."/effects/";
 
 $IMAGE_BASE = "image-";
 $IMAGE_EXT = ".jpg";

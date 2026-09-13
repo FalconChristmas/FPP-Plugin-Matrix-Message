@@ -13,10 +13,9 @@ include_once("/opt/fpp/www/common.php");
 include_once("functions.inc.php");
 
 require ("lock.helper.php");
-define('LOCK_DIR', '/tmp/');
-define('LOCK_SUFFIX', '.lock');
+define('LOCK_FILE', __DIR__.'/matrix.lock');
 
-$logFile = $settings['logDirectory']."/".$pluginName.".log";
+$logFile = $settings['logDirectory']."/plugin-".$pluginName.".log";
 
 
 $fpp_matrixtools_Plugin = "fpp-matrixtools";
@@ -30,8 +29,8 @@ logEntry("unlocking matrix.php");
 //lockHelper::unlock();
 //clearMatrix();
 
-if(file_exists("/tmp/matrix.php.lock")) {
-	$matrix_pid = file_get_contents("/tmp/matrix.php.lock");
+if(file_exists(LOCK_FILE)) {
+	$matrix_pid = file_get_contents(LOCK_FILE);
 	
 	$cmdKill = "sudo kill -9 ".$matrix_pid;
 	

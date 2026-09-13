@@ -7,7 +7,7 @@ include_once 'commonFunctions.inc.php';
 $pluginName = basename(dirname(__FILE__));
 
 
-$logFile = $settings['logDirectory']."/".$pluginName.".log";
+$logFile = $settings['logDirectory']."/plugin-".$pluginName.".log";
 
 if(isset($_POST['updateFonts']))
 {
