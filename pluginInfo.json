@@ -32,5 +32,28 @@
             "branch": "master",
             "sha": ""
         }
-    ]
+    ],
+    "privacy": {
+        "summary": "Talks only to FPP on this device, but its log keeps the text of every message it showed, which may include visitor messages, until you delete it.",
+        "sends": [],
+        "collects": [
+            {
+                "what": "the text of messages it displayed, which may have been sent in by visitors",
+                "about": "visitors",
+                "keptDays": null,
+                "canDelete": false,
+                "where": "plugin log"
+            }
+        ],
+        "sensors": [],
+        "remoteAccess": "none",
+        "systemChanges": [
+            {
+                "kind": "core-settings",
+                "what": "writes a last-read marker into the settings file of each plugin whose messages it shows (config/plugin.<name>)"
+            }
+        ],
+        "closedCode": false,
+        "other": "The Fonts page moves .ttf files you upload from media/upload/ into /usr/local/share/fonts (system-wide, kept after uninstall). Its settings file and the log are kept after uninstall; FPP rotates the log at 10 MB and its File Manager can delete it."
+    }
 }
